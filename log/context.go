@@ -5,8 +5,8 @@ import "context"
 type MetadataContextKeyType string
 
 const (
-	// MetadataContextKey is a custom context key
-	MetadataContextKey MetadataContextKeyType = "log.metadata.key"
+	// MetadataContextKey is a custom context key for metadata
+	MetadataContextKey MetadataContextKeyType = "metadata.context.key"
 )
 
 // NewContext create new context that is injected with log.Metadata

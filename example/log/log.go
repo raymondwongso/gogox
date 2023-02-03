@@ -22,7 +22,7 @@ func (s service) DoSomething() error {
 	err := fmt.Errorf("some error come up")
 	if err != nil {
 		s.logger.Error(err.Error())
-		s.logger2.Error(err.Error())
+		s.logger2.Errorw(err.Error(), log.Metadata{"error": err.Error(), "user_id": 1})
 		s.logger3.Error(err.Error())
 		return err
 	}
@@ -31,14 +31,14 @@ func (s service) DoSomething() error {
 }
 
 func main() {
-	// NopLogger do nothing
+	// NopLogger do nothing`
 	nopLogger := &nop.Logger{}
 
 	// Logrus logger
 	ll := logrus.New()
 	ll.SetLevel(logrus.ErrorLevel)
 	ll.SetFormatter(&logrus.JSONFormatter{})
-	logrusLogger := gogox_logrus.New(ll, log.Metadata{"service": "api_logrus"})
+	logrusLogger := gogox_logrus.New(ll, log.Metadata{"service": "api", "version": "1.2.1"})
 
 	// zap logger
 	zz, _ := zap.NewProduction()

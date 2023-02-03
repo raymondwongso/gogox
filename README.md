@@ -1,3 +1,3 @@
 # gogox
 
-Gogox is a generic wrapper for various golang libraries.
+Gogox is a collection of reusable golang components
