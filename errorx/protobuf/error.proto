@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package raymondwongso.gogox.errorx;
+
+option go_package = "github.com/raymondwongso/gogox/errorx/protobuf";
+
+message Error {
+  string code = 1;
+  string message = 2;
+  repeated Detail details = 3;
+}
+
+message Detail {
+  string field = 1;
+  string message = 2;
+}
