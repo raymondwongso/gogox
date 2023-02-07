@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/raymondwongso/gogox/errorx"
 	"github.com/raymondwongso/gogox/grpc/protobuf"
 	"github.com/raymondwongso/gogox/log"
@@ -78,5 +77,4 @@ func (h *ErrorHandler) ErrorxProtoErrorHandler(ctx context.Context, mux *runtime
 	}
 
 	runtime.DefaultHTTPError(ctx, mux, marshaler, w, r, err)
-	return
 }
