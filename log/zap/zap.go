@@ -3,6 +3,7 @@ package zap
 import (
 	"github.com/raymondwongso/gogox/log"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 // Logger is a wrapper of zap.Logger that implements Logger interface.
@@ -119,6 +120,58 @@ func (l *Logger) Panicw(msg string, md log.Metadata, args ...interface{}) {
 	}
 
 	l.zap.Log(zap.PanicLevel, msg, buildZapFields(log.MergeMetadata(l.baseMd, md))...)
+}
+
+func (l *Logger) Log(level log.LogLevel, msg string, args ...interface{}) {
+	if l.zap == nil {
+		return
+	}
+
+	var zapLevel zapcore.Level
+	switch level {
+	case log.DebugLevel:
+		zapLevel = zap.DebugLevel
+	case log.InfoLevel:
+		zapLevel = zap.InfoLevel
+	case log.WarnLevel:
+		zapLevel = zap.WarnLevel
+	case log.ErrorLevel:
+		zapLevel = zap.ErrorLevel
+	case log.FatalLevel:
+		zapLevel = zap.FatalLevel
+	case log.PanicLevel:
+		zapLevel = zap.PanicLevel
+	default:
+		zapLevel = zap.DebugLevel
+	}
+
+	l.zap.Log(zapLevel, msg, buildZapFields(l.baseMd)...)
+}
+
+func (l *Logger) Logw(level log.LogLevel, msg string, md log.Metadata, args ...interface{}) {
+	if l.zap == nil {
+		return
+	}
+
+	var zapLevel zapcore.Level
+	switch level {
+	case log.DebugLevel:
+		zapLevel = zap.DebugLevel
+	case log.InfoLevel:
+		zapLevel = zap.InfoLevel
+	case log.WarnLevel:
+		zapLevel = zap.WarnLevel
+	case log.ErrorLevel:
+		zapLevel = zap.ErrorLevel
+	case log.FatalLevel:
+		zapLevel = zap.FatalLevel
+	case log.PanicLevel:
+		zapLevel = zap.PanicLevel
+	default:
+		zapLevel = zap.DebugLevel
+	}
+
+	l.zap.Log(zapLevel, msg, buildZapFields(log.MergeMetadata(l.baseMd, md))...)
 }
 
 func buildZapFields(md log.Metadata) (res []zap.Field) {

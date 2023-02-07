@@ -142,3 +142,61 @@ func (l *Logger) Panicw(msg string, md log.Metadata, args ...interface{}) {
 		log.MergeMetadata(l.baseMd, md),
 	)).Logf(logrus.PanicLevel, msg, args...)
 }
+
+func (l *Logger) Log(level log.LogLevel, msg string, args ...interface{}) {
+	if l.logrus == nil {
+		return
+	}
+
+	var logrusLevel logrus.Level
+	switch level {
+	case log.TraceLevel:
+		logrusLevel = logrus.TraceLevel
+	case log.DebugLevel:
+		logrusLevel = logrus.DebugLevel
+	case log.InfoLevel:
+		logrusLevel = logrus.InfoLevel
+	case log.WarnLevel:
+		logrusLevel = logrus.WarnLevel
+	case log.ErrorLevel:
+		logrusLevel = logrus.ErrorLevel
+	case log.FatalLevel:
+		logrusLevel = logrus.FatalLevel
+	case log.PanicLevel:
+		logrusLevel = logrus.PanicLevel
+	default:
+		logrusLevel = logrus.DebugLevel
+	}
+
+	l.logrus.WithFields(logrus.Fields(l.baseMd)).Logf(logrusLevel, msg, args...)
+}
+
+func (l *Logger) Logw(level log.LogLevel, msg string, md log.Metadata, args ...interface{}) {
+	if l.logrus == nil {
+		return
+	}
+
+	var logrusLevel logrus.Level
+	switch level {
+	case log.TraceLevel:
+		logrusLevel = logrus.TraceLevel
+	case log.DebugLevel:
+		logrusLevel = logrus.DebugLevel
+	case log.InfoLevel:
+		logrusLevel = logrus.InfoLevel
+	case log.WarnLevel:
+		logrusLevel = logrus.WarnLevel
+	case log.ErrorLevel:
+		logrusLevel = logrus.ErrorLevel
+	case log.FatalLevel:
+		logrusLevel = logrus.FatalLevel
+	case log.PanicLevel:
+		logrusLevel = logrus.PanicLevel
+	default:
+		logrusLevel = logrus.DebugLevel
+	}
+
+	l.logrus.WithFields(logrus.Fields(
+		log.MergeMetadata(l.baseMd, md),
+	)).Logf(logrusLevel, msg, args...)
+}

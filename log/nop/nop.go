@@ -25,3 +25,6 @@ func (l *Logger) Fatal(msg string, args ...interface{})                   {}
 func (l *Logger) Fatalw(msg string, md log.Metadata, args ...interface{}) {}
 func (l *Logger) Panic(msg string, args ...interface{})                   {}
 func (l *Logger) Panicw(msg string, md log.Metadata, args ...interface{}) {}
+
+func (l *Logger) Log(level log.LogLevel, msg string, args ...interface{})                   {}
+func (l *Logger) Logw(level log.LogLevel, msg string, md log.Metadata, args ...interface{}) {}

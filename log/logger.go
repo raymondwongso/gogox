@@ -1,5 +1,18 @@
 package log
 
+// LogLevel defines log level
+type LogLevel int
+
+const (
+	TraceLevel LogLevel = iota
+	DebugLevel
+	InfoLevel
+	WarnLevel
+	ErrorLevel
+	FatalLevel
+	PanicLevel
+)
+
 // Logger defines generic interface for all logger.
 type Logger interface {
 	Trace(msg string, args ...interface{})
@@ -16,4 +29,7 @@ type Logger interface {
 	Fatalw(msg string, md Metadata, args ...interface{})
 	Panic(msg string, args ...interface{})
 	Panicw(msg string, md Metadata, args ...interface{})
+
+	Log(level LogLevel, msg string, args ...interface{})
+	Logw(level LogLevel, msg string, md Metadata, args ...interface{})
 }
