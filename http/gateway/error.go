@@ -2,13 +2,14 @@ package gateway
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/raymondwongso/gogox/errorx"
+	grpc_errorx "github.com/raymondwongso/gogox/grpc/errorx"
 	"github.com/raymondwongso/gogox/grpc/protobuf"
 	"github.com/raymondwongso/gogox/log"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
@@ -23,29 +24,52 @@ func NewErrorHandler(logger log.Logger) *ErrorHandler {
 
 // ErrroxProtoErrorHandler convert error proto message into gogox error.
 func (h *ErrorHandler) ErrorxProtoErrorHandler(ctx context.Context, mux *runtime.ServeMux, marshaler runtime.Marshaler, w http.ResponseWriter, r *http.Request, err error) {
-	s, ok := status.FromError(err)
-
 	logMd := log.Metadata{
 		"url":   r.URL.Path,
 		"error": err.Error(),
 	}
 
+	response, httpStatus := h.httpResponse(ctx, err, r, logMd)
+
+	buf, marshalErr := marshaler.Marshal(response)
+	if marshalErr != nil {
+		h.logger.Errorw("error marshal gogox error", logMd)
+		response = &grpc_errorx.GrpcError{
+			Code:            codes.Internal,
+			UnderlyingError: errorx.New(errorx.CodeInternal, marshalErr.Error()),
+		}
+		httpStatus = http.StatusInternalServerError
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(httpStatus)
+	_, _ = w.Write(buf)
+}
+
+func (h *ErrorHandler) httpResponse(ctx context.Context, err error, r *http.Request, logMd log.Metadata) (interface{}, int) {
+	s, ok := status.FromError(err)
+
+	internalErr := &errorx.Error{
+		Code:    errorx.CodeInternal,
+		Message: err.Error(),
+		Details: []*errorx.Details{},
+	}
+
 	if !ok {
-		h.logger.Error("error parsing status grpc", logMd)
-		runtime.DefaultHTTPError(ctx, mux, marshaler, w, r, err)
-		return
+		h.logger.Errorw("error parsing status grpc", logMd)
+		return internalErr, http.StatusInternalServerError
 	}
 
 	sdetails := s.Proto().GetDetails()
 	if len(sdetails) == 0 {
-		h.logger.Error("error details not found", logMd)
-		runtime.DefaultHTTPError(ctx, mux, marshaler, w, r, err)
-		return
+		h.logger.Errorw("error details not found", logMd)
+		return internalErr, http.StatusInternalServerError
 	}
 
-	// sdetails will only contain 1 gogox error
 	for _, detail := range sdetails {
-		fmt.Printf("detail type url: %s\n", detail.TypeUrl)
+		if detail.TypeUrl != "type.googleapis.com/raymondwongso.gogox.grpc.Error" {
+			continue
+		}
 
 		pbErr := protobuf.Error{}
 		unmarshalErr := detail.UnmarshalTo(&pbErr)
@@ -63,18 +87,9 @@ func (h *ErrorHandler) ErrorxProtoErrorHandler(ctx context.Context, mux *runtime
 				})
 			}
 
-			buf, marshalErr := marshaler.Marshal(gogoxErr)
-			if marshalErr != nil {
-				h.logger.Error("error marshal gogox error", logMd)
-				runtime.DefaultHTTPError(ctx, mux, marshaler, w, r, err)
-				return
-			}
-
-			w.WriteHeader(runtime.HTTPStatusFromCode(s.Code()))
-			_, _ = w.Write(buf)
-			return
+			return gogoxErr, runtime.HTTPStatusFromCode(s.Code())
 		}
 	}
 
-	runtime.DefaultHTTPError(ctx, mux, marshaler, w, r, err)
+	return internalErr, http.StatusInternalServerError
 }
