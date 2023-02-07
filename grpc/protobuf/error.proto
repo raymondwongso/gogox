@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package raymondwongso.gogox.errorx;
+package raymondwongso.gogox.grpclib;
 
-option go_package = "github.com/raymondwongso/gogox/errorx/protobuf";
+option go_package = "github.com/raymondwongso/gogox/grpclib/protobuf";
 
 message Error {
   string code = 1;
