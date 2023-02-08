@@ -1,6 +1,10 @@
 package log
 
-import "context"
+import (
+	"context"
+
+	"golang.org/x/exp/maps"
+)
 
 type MetadataContextKeyType string
 
@@ -33,5 +37,8 @@ func MetadataFromContext(ctx context.Context) Metadata {
 		return Metadata{}
 	}
 
-	return ctxVal.(Metadata)
+	md := ctxVal.(Metadata)
+	res := Metadata{}
+	maps.Copy(res, md)
+	return res
 }
