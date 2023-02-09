@@ -2,19 +2,27 @@ package trace
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/raymondwongso/gogox/log"
 	"github.com/raymondwongso/gogox/trace"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
 
 // UnaryServerInterceptor intercepts a GRPC server response and inject the trace ID.
-func UnaryServerInterceptor(traceField string) grpc.UnaryServerInterceptor {
+// traceField is used to inject traceID to log
+// traceHeaderKey is metadata header key for traceID
+func UnaryServerInterceptor(traceField, traceHeaderKey string) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
-		traceID := trace.TraceFromContext(ctx)
-
+		// get traceID from request header, if not found check request context.
+		// otherwise, generate new trace
+		traceID := valueFromMetadata(ctx, traceHeaderKey)
 		if traceID == "" {
-			traceID = trace.New()
+			traceID = trace.TraceFromContext(ctx)
+			if traceID == "" {
+				traceID = trace.New()
+			}
 		}
 
 		ctx = trace.NewContext(ctx, traceID)
@@ -26,4 +34,19 @@ func UnaryServerInterceptor(traceField string) grpc.UnaryServerInterceptor {
 
 		return handler(ctx, req)
 	}
+}
+
+func valueFromMetadata(ctx context.Context, key string) string {
+	md, ok := metadata.FromIncomingContext(ctx)
+	fmt.Println(md)
+	if !ok {
+		return ""
+	}
+
+	ids, ok := md[key]
+	if !ok || len(ids) == 0 {
+		return ""
+	}
+
+	return ids[0]
 }
