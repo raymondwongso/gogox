@@ -24,7 +24,7 @@ func TraceMiddleware(traceField string, handler http.Handler) http.Handler {
 
 		ctx = log.NewContext(ctx, logMd)
 
-		r = r.Clone(ctx)
+		r = r.WithContext(ctx)
 
 		handler.ServeHTTP(w, r)
 	})
