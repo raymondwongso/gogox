@@ -12,11 +12,12 @@ import (
 func UnaryServerInterceptor(traceField string) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
 		traceID := trace.TraceFromContext(ctx)
+
 		if traceID == "" {
 			traceID = trace.New()
 		}
 
-		ctx = trace.NewContext(ctx, trace.New())
+		ctx = trace.NewContext(ctx, traceID)
 
 		logMd := log.MetadataFromContext(ctx)
 		logMd[traceField] = traceID

@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/raymondwongso/gogox/log"
-	"golang.org/x/exp/maps"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -68,11 +67,7 @@ func newLogMetadata(ctx context.Context, info *grpc.UnaryServerInfo, startTime t
 	service := path.Dir(fullMethod)[1:]
 	method := path.Base(fullMethod)
 
-	ctxMd := log.MetadataFromContext(ctx)
-	logMd := log.Metadata{}
-
-	// do not reuse ctx md, to not clutter metadata with grpc specific fields.
-	maps.Copy(logMd, ctxMd)
+	logMd := log.MetadataFromContext(ctx)
 
 	logMd["system"] = "grpc"
 	logMd["span.kind"] = "server"
