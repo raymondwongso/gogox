@@ -1,5 +1,7 @@
 package log
 
+//go:generate mockgen -destination=mock/logger.go -package=cachelog -source=logger.go
+
 // LogLevel defines log level
 type LogLevel int
 
