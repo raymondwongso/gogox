@@ -2,7 +2,6 @@ package trace
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/raymondwongso/gogox/log"
 	"github.com/raymondwongso/gogox/trace"
@@ -38,7 +37,6 @@ func UnaryServerInterceptor(traceField, traceHeaderKey string) grpc.UnaryServerI
 
 func valueFromMetadata(ctx context.Context, key string) string {
 	md, ok := metadata.FromIncomingContext(ctx)
-	fmt.Println(md)
 	if !ok {
 		return ""
 	}
