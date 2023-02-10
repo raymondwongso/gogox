@@ -160,9 +160,9 @@ func Parse(err error) (*Error, bool) {
 	return e, ok
 }
 
-// ParseAndWrap provides sugar syntax for parsing err to Error instance
-// if the parsing fail, automatically wrap the error into internal error with msg
-// if the parsing successful, return the original error
+// ParseAndWrap provides sugar syntax for parsing err to Error instance.
+// if the parsing fail, automatically wrap the error into internal error with msg.
+// if the parsing successful, return the original error.
 func ParseAndWrap(err error, msg string) *Error {
 	e, ok := err.(*Error)
 	if !ok {
