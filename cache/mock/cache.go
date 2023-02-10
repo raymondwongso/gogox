@@ -36,15 +36,20 @@ func (m *MockCache) EXPECT() *MockCacheMockRecorder {
 }
 
 // Del mocks base method.
-func (m *MockCache) Del(ctx context.Context, key string) {
+func (m *MockCache) Del(ctx context.Context, keys ...string) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "Del", ctx, key)
+	varargs := []interface{}{ctx}
+	for _, a := range keys {
+		varargs = append(varargs, a)
+	}
+	m.ctrl.Call(m, "Del", varargs...)
 }
 
 // Del indicates an expected call of Del.
-func (mr *MockCacheMockRecorder) Del(ctx, key interface{}) *gomock.Call {
+func (mr *MockCacheMockRecorder) Del(ctx interface{}, keys ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Del", reflect.TypeOf((*MockCache)(nil).Del), ctx, key)
+	varargs := append([]interface{}{ctx}, keys...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Del", reflect.TypeOf((*MockCache)(nil).Del), varargs...)
 }
 
 // Get mocks base method.
