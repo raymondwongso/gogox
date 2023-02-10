@@ -36,13 +36,15 @@ func (m *MockCache) EXPECT() *MockCacheMockRecorder {
 }
 
 // Del mocks base method.
-func (m *MockCache) Del(ctx context.Context, keys ...string) {
+func (m *MockCache) Del(ctx context.Context, keys ...string) error {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx}
 	for _, a := range keys {
 		varargs = append(varargs, a)
 	}
-	m.ctrl.Call(m, "Del", varargs...)
+	ret := m.ctrl.Call(m, "Del", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // Del indicates an expected call of Del.
