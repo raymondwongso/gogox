@@ -39,14 +39,14 @@ func Test_NewfWithLog(t *testing.T) {
 	assert.Equal(t, "some custom log message with more information", e.LogError())
 }
 
-func Test_ParseError(t *testing.T) {
+func Test_Parse(t *testing.T) {
 	notStandardError := fmt.Errorf("some error")
-	e1, ok1 := errorx.ParseError(notStandardError)
+	e1, ok1 := errorx.Parse(notStandardError)
 	assert.Nil(t, e1)
 	assert.False(t, ok1)
 
 	standardError := errorx.New(errorx.CodeInternal, "unauthorized")
-	e2, ok2 := errorx.ParseError(standardError)
+	e2, ok2 := errorx.Parse(standardError)
 	assert.Equal(t, errorx.CodeInternal, e2.Code)
 	assert.Equal(t, "unauthorized", e2.Error())
 	assert.True(t, ok2)
@@ -119,5 +119,25 @@ func Test_AddDetails(t *testing.T) {
 func Test_PrintStackTrace(t *testing.T) {
 	assert.NotPanics(t, func() {
 		errorx.New("some_code", "some_string").PrintStackTrace()
+	})
+}
+
+func Test_ParseAndWrap(t *testing.T) {
+	t.Run("parse fail, return wrapped error", func(t *testing.T) {
+		err := fmt.Errorf("some error")
+
+		gErr := errorx.ParseAndWrap(err, "This is some default error message")
+		assert.Equal(t, errorx.CodeInternal, gErr.Code)
+		assert.Equal(t, "This is some default error message", gErr.Message)
+		assert.Equal(t, "[common.internal] This is some default error message: some error", gErr.LogError())
+	})
+
+	t.Run("parse success, return orig error", func(t *testing.T) {
+		err := errorx.New("some.code", "some error message")
+
+		gErr := errorx.ParseAndWrap(err, "This is some default error message")
+		assert.Equal(t, "some.code", gErr.Code)
+		assert.Equal(t, "some error message", gErr.Message)
+		assert.Equal(t, err.LogError(), gErr.LogError())
 	})
 }

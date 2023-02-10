@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/raymondwongso/gogox/errorx"
 )
 
 // Redis implements Cache interface for redis memory storage
@@ -22,10 +21,6 @@ func New(client *redis.Client) *Redis {
 // Get fetch key value and then unmarshal it into dest. Will return gogox error with code CodeNotFound if key is empty.
 func (r *Redis) Get(ctx context.Context, key string, dest interface{}) error {
 	bytes, err := r.client.Get(ctx, key).Bytes()
-	if err == redis.Nil {
-		return errorx.ErrNotFound("redis key is not found")
-	}
-
 	if err != nil {
 		return err
 	}

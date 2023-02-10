@@ -9,11 +9,8 @@ import (
 
 	"github.com/go-redis/redismock/v8"
 	"github.com/raymondwongso/gogox/cache/redis"
-	"github.com/raymondwongso/gogox/errorx"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-
-	goredis "github.com/go-redis/redis/v8"
 )
 
 type RedisTestSuite struct {
@@ -73,19 +70,7 @@ func (ts *RedisTestSuite) Test_Get() {
 				res: &testStruct{ID: 1, Name: "John"},
 			},
 		},
-		"error - key not found": {
-			args: args{
-				ctx: context.Background(),
-			},
-			mock: mock{
-				err: goredis.Nil,
-			},
-			exp: exp{
-				res: &testStruct{},
-				err: errorx.ErrNotFound("redis key is not found"),
-			},
-		},
-		"error - unexpected": {
+		"error": {
 			args: args{
 				ctx: context.Background(),
 			},

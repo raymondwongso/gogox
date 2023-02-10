@@ -2,6 +2,8 @@ package stats
 
 import "golang.org/x/exp/maps"
 
+//go:generate mockgen -destination=mock/stats.go -package=statsmock -source=stats.go
+
 // Stats defines commonly used stats usecases
 type Stats interface {
 	// Increment increase metric by 1
