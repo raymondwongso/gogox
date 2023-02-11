@@ -4,13 +4,17 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"testing"
 	"time"
 
 	"github.com/go-redis/redismock/v8"
 	"github.com/raymondwongso/gogox/cache/redis"
+	"github.com/raymondwongso/gogox/errorx"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
+
+	goredis "github.com/go-redis/redis/v8"
 )
 
 type RedisTestSuite struct {
@@ -40,70 +44,49 @@ const (
 )
 
 func (ts *RedisTestSuite) Test_Get() {
-	type args struct {
-		ctx context.Context
-	}
+	testRes := testStruct{ID: 1, Name: "John"}
 
-	type mock struct {
-		res interface{}
-		err error
-	}
+	ts.Run("success", func() {
+		dest := testStruct{}
 
-	type exp struct {
-		res interface{}
-		err error
-	}
+		expStr := ts.mock.ExpectGet(tempKey)
+		resBytes, _ := json.Marshal(&testRes)
+		expStr.SetVal(string(resBytes))
 
-	testCases := map[string]struct {
-		args args
-		mock mock
-		exp  exp
-	}{
-		"success": {
-			args: args{
-				ctx: context.Background(),
-			},
-			mock: mock{
-				res: &testStruct{ID: 1, Name: "John"},
-			},
-			exp: exp{
-				res: &testStruct{ID: 1, Name: "John"},
-			},
-		},
-		"error": {
-			args: args{
-				ctx: context.Background(),
-			},
-			mock: mock{
-				err: errors.New("some error"),
-			},
-			exp: exp{
-				res: &testStruct{},
-				err: errors.New("some error"),
-			},
-		},
-	}
+		err := ts.client.Get(context.Background(), tempKey, &dest)
 
-	for name, tc := range testCases {
-		ts.Run(name, func() {
-			dest := testStruct{}
+		assert.Equal(ts.T(), &testRes, &dest)
+		assert.NoError(ts.T(), err)
+	})
 
-			expStr := ts.mock.ExpectGet(tempKey)
-			if tc.mock.err != nil {
-				expStr.SetErr(tc.mock.err)
-			}
+	ts.Run("error - not found", func() {
+		dest := testStruct{}
 
-			if tc.mock.res != nil {
-				resBytes, _ := json.Marshal(tc.mock.res)
-				expStr.SetVal(string(resBytes))
-			}
+		expStr := ts.mock.ExpectGet(tempKey)
+		resBytes, _ := json.Marshal(&testStruct{})
+		expStr.SetVal(string(resBytes))
+		expStr.SetErr(goredis.Nil)
 
-			err := ts.client.Get(tc.args.ctx, tempKey, &dest)
+		err := ts.client.Get(context.Background(), tempKey, &dest)
 
-			assert.Equal(ts.T(), tc.exp.res, &dest)
-			assert.Equal(ts.T(), tc.exp.err, err)
-		})
-	}
+		assert.Equal(ts.T(), &testStruct{}, &dest)
+		gogoxErr, _ := errorx.Parse(err)
+		assert.Equal(ts.T(), errorx.CodeNotFound, gogoxErr.Code)
+	})
+
+	ts.Run("error - unexpected", func() {
+		dest := testStruct{}
+
+		expStr := ts.mock.ExpectGet(tempKey)
+		resBytes, _ := json.Marshal(&testStruct{})
+		expStr.SetVal(string(resBytes))
+		expStr.SetErr(fmt.Errorf("some error"))
+
+		err := ts.client.Get(context.Background(), tempKey, &dest)
+
+		assert.Equal(ts.T(), &testStruct{}, &dest)
+		assert.Equal(ts.T(), fmt.Errorf("some error"), err)
+	})
 }
 
 func (ts *RedisTestSuite) Test_Set() {
