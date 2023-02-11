@@ -18,3 +18,15 @@ func Test_ErrNotFound(t *testing.T) {
 	assert.Equal(t, "some error", err.Error())
 	assert.Equal(t, errorx.CodeNotFound, err.Code)
 }
+
+func Test_ErrUnauthorized(t *testing.T) {
+	err := errorx.ErrUnauthorized("some error")
+	assert.Equal(t, "some error", err.Error())
+	assert.Equal(t, errorx.CodeUnauthorized, err.Code)
+}
+
+func Test_ErrInvalidParameter(t *testing.T) {
+	err := errorx.ErrInvalidParameter("some error")
+	assert.Equal(t, "some error", err.Error())
+	assert.Equal(t, errorx.CodeInvalidParameter, err.Code)
+}
