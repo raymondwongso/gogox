@@ -6,7 +6,7 @@
 3. `Del` delete a certain cache key.
 
 ## How to Use
-There are 2 provided cache adapter: `redis` and `memcache`. Define your object and inject the `Cache` implementor into it. Populate the implementor with your choosen adapter.
+There are 2 provided cache adapter: `redis`, `memcache` and `nop`. Define your object and inject the `Cache` implementor into it. Populate the implementor with your choosen adapter.
 
 ```go
 
