@@ -16,7 +16,7 @@ func UnaryServerInterceptor(traceField, traceHeaderKey string) grpc.UnaryServerI
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
 		// get traceID from request header, if not found check request context.
 		// otherwise, generate new trace
-		traceID := valueFromMetadata(ctx, traceHeaderKey)
+		traceID := valueFromMetadata(ctx, traceHeaderKey, metadata.FromIncomingContext)
 		if traceID == "" {
 			traceID = trace.TraceFromContext(ctx)
 			if traceID == "" {
@@ -35,8 +35,8 @@ func UnaryServerInterceptor(traceField, traceHeaderKey string) grpc.UnaryServerI
 	}
 }
 
-func valueFromMetadata(ctx context.Context, key string) string {
-	md, ok := metadata.FromIncomingContext(ctx)
+func valueFromMetadata(ctx context.Context, key string, mdFunc func(ctx context.Context) (metadata.MD, bool)) string {
+	md, ok := mdFunc(ctx)
 	if !ok {
 		return ""
 	}
