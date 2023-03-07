@@ -14,6 +14,12 @@ type GrpcError struct {
 	UnderlyingError *errorx.Error
 }
 
+func New(code codes.Code, underlyingErr *errorx.Error) *GrpcError {
+	return &GrpcError{
+		Code: code, UnderlyingError: underlyingErr,
+	}
+}
+
 // Error implements error interface
 func (e *GrpcError) Error() string {
 	return e.UnderlyingError.Error()
