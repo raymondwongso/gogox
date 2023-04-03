@@ -35,17 +35,22 @@ var (
 )
 
 // UnaryServerInterceptor intercepts a GRPC server response and inject
-func UnaryServerInterceptor(logger log.Logger) grpc.UnaryServerInterceptor {
+func UnaryServerInterceptor(logger log.Logger, opts options) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
 		startTime := time.Now()
 		logMd := newLogMetadata(ctx, info, startTime)
 
 		resp, err = handler(ctx, req)
 
+		if !opts.ShouldLog(info, err) {
+			return resp, err
+		}
+
 		code := status.Code(err)
 		level := levelMapping[code]
 		duration_ms := float32(time.Since(startTime).Nanoseconds()/1000) / 1000
 
+		logMd["grpc.request"] = req
 		logMd["grpc.code"] = code
 		logMd["grpc.time_ms"] = duration_ms
 
