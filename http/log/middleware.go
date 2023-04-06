@@ -29,7 +29,7 @@ func (r *loggingResponseWriter) WriteHeader(statusCode int) {
 }
 
 // LoggingMiddleware provides log middleware that log request and response.
-func LoggingMiddleware(logger log.Logger, handler http.Handler) http.Handler {
+func LoggingMiddleware(logger log.Logger, handler http.Handler, opts options) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		startTime := time.Now()
 		md := newLogMetadata(r, startTime)
@@ -40,9 +40,13 @@ func LoggingMiddleware(logger log.Logger, handler http.Handler) http.Handler {
 
 		handler.ServeHTTP(lrw, r)
 
+		status := lrw.status
+		if !opts.ShouldLog(r, status) {
+			return
+		}
+
 		duration_ms := float32(time.Since(startTime).Nanoseconds()/1000) / 1000
 		size := lrw.size
-		status := lrw.status
 
 		// TODO(raymondwongso) research more about status in integration with grpc gateway, somehow status is 0
 		// for now, override to 200 assuming it is a successful request

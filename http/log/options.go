@@ -5,7 +5,7 @@ import (
 )
 
 // Decider defines rules for surpressing log
-type Decider func(req *http.Request, err error) bool
+type Decider func(req *http.Request, status int) bool
 
 type options struct {
 	ShouldLog Decider
@@ -20,15 +20,15 @@ func DefaultOptions() options {
 
 // DefaultDecider returns always true decider
 func DefaultDecider() Decider {
-	return func(req *http.Request, err error) bool {
+	return func(req *http.Request, status int) bool {
 		return true
 	}
 }
 
 // SkipPrometheusDecider returns common skip prometheus /metric
 func SkipPrometheusDecider() Decider {
-	return func(req *http.Request, err error) bool {
-		if err == nil && req.URL.Path == "/metrics" {
+	return func(req *http.Request, status int) bool {
+		if status == 200 && req.URL.Path == "/metrics" {
 			return false
 		}
 		return true
