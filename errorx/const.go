@@ -8,7 +8,7 @@ const (
 	// CodeUnauthorized defines common unauthorized error code
 	CodeUnauthorized = "common.unauthorized"
 	// CodeInvalidParameter defines common invalid parameter error code
-	CodeInvalidParameter = "commmon.invalid_parameter"
+	CodeInvalidParameter = "common.invalid_parameter"
 )
 
 // ErrInternal returns generic gogox error with CodeInternal
