@@ -10,3 +10,4 @@ Below listed available components, they have their own README section (linked):
 5. [log](/log/README.md) is a log adapter, so that your application doesn't need to know the logger implementation.
 6. [stats](/stats/README.md) is a stats adapter, so that your application doesn't need to know the stats implementation.
 7. [trace](/trace/README.md) is a trace ID generator.
+8. [sugar](/sugar/README.md) is a sugar syntax package.
