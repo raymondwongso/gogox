@@ -63,3 +63,11 @@ func main() {
   service := &Service{cache: memcacheCache}
 }
 ```
+
+Currently supported adapter:
+1. Memcache
+2. Redis
+3. Nop
+
+## Notes on Redis specific commands
+Some redis specific method like `INCR` is not yet supported for pre-release versions. There is a plan to support redis-like commands but the earliest is 1.x version.

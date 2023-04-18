@@ -1,10 +1,10 @@
 # log
 
-Log provides generic logger that is pluggable
+log provides generic logger interface so your application does not need to know which logger adapter you use. This simplify testing and keep the code clean.
 
 ## How to Use
 
-`Logger` interface contains commonly used logging usecases. Inject `Logger` into your object. Use adapters provided (logrus or zap)
+`Logger` interface contains commonly used logging usecases. Inject `Logger` into your object.
 
 ```go
 // service.go
@@ -34,13 +34,19 @@ import (
 func main() {
   logrus := logrus.New()
   logrus.SetFormatter(&logrus.JSONFormatter{})
-  logrus.SetLevel(logrus.ErrorLevel)
+  logrus.SetLevel(logrus.DebugLevel)
 
   logger := gogox_logrus.New(logrus, nil)
 
   service := service.NewService(logger)
 }
 ```
+
+Currently supported adapters:
+1. Logrus
+2. Zap
+3. Zerolog (Will be available in 1.x)
+4. Nop
 
 ## Metadata
 
@@ -65,7 +71,8 @@ s.logger.Errorw("some error happened", log.Metadata{"error": err.Error(), "user_
 ```
 
 ## Context
-Use `NewContext` to inject your log metadata to context.
+
+Context is useful for passing base metadata into all your log entries. Use `NewContext` to inject your log metadata to context.
 
 ```go
 ctx := log.NewContext(context.Background(), log.Metadata{"user_id": 123})

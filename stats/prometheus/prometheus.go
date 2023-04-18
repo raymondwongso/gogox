@@ -7,7 +7,7 @@ import (
 	"github.com/raymondwongso/gogox/stats"
 )
 
-// Stats define prometheus stats
+// Stats define prometheus stats.Stats implementor
 type Stats struct {
 	namespace string
 	baseTags  stats.Tags
@@ -47,7 +47,7 @@ func New(namespace string, baseTags stats.Tags) *Stats {
 	}
 }
 
-// metricKey generate unique metric key
+// metricKey generate unique metric key for cache mapping.
 func metricKey(metric string, tags stats.Tags) string {
 	return fmt.Sprintf("%s:%s", metric, tags)
 }
