@@ -1,6 +1,6 @@
 # trace
 
-Trace provides usecase for generating trace id, commonly used for tracing your request througout its lifecycle.
+Trace provides usecase for generating trace id, commonly used for tracing your request throughout its lifecycle.
 
 ## How to Use
 
@@ -11,11 +11,13 @@ Trace provides usecase for generating trace id, commonly used for tracing your r
 Use `NewContext` to inject your trace to context.
 
 ```go
-ctx := trace.NewContext(context.Background(), "your-trace")
+ctx := trace.NewContext(context.Background(), "your-trace-id")
 ```
 
 Use `TraceFromContext` to extract your trace from context
 
 ```go
 trace := trace.TraceFromContext(ctx)
+fmt.Println(trace)
+// your-trace-id
 ```

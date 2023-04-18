@@ -1,6 +1,6 @@
 # stats
 
-Stats provides usecase for scoring your app metrics
+stats provides usecase for scoring your app metrics, commonly used for monitoring or capturing your business metric.
 
 ## How to Use
 
@@ -14,6 +14,7 @@ type service struct {
 func (s *service) DoSomething() {
   // something happened
   if err != nil {
+    // Increment your failed metric count, used for monitoring or alerting
     s.stats.Increment("something_failed", stats.Option{
       Tags: stats.Tags{"method": "DoSomething"}
     })
@@ -21,7 +22,7 @@ func (s *service) DoSomething() {
 }
 ```
 
-You can inject stats implementor.
+You can inject stats implementor using provided adapter.
 ```go
 
 import (
@@ -35,3 +36,8 @@ func main() {
   service := service.NewService(prom)
 }
 ```
+
+Currently supported adapter:
+1. Prometheus
+2. Datadog (Will be in 1.x release)
+3. Nop

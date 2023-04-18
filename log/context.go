@@ -6,6 +6,7 @@ import (
 	"golang.org/x/exp/maps"
 )
 
+// MetadataContextKeyType defines custom type for context metadata
 type MetadataContextKeyType string
 
 const (
