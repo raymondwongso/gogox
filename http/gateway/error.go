@@ -60,10 +60,11 @@ func (h *ErrorHandler) httpResponse(ctx context.Context, err error, r *http.Requ
 		return internalErr, http.StatusInternalServerError
 	}
 
+	httpStatus := runtime.HTTPStatusFromCode(s.Code())
 	sdetails := s.Proto().GetDetails()
 	if len(sdetails) == 0 {
 		h.logger.Errorw("error details not found", logMd)
-		return internalErr, http.StatusInternalServerError
+		return internalErr, httpStatus
 	}
 
 	for _, detail := range sdetails {
@@ -87,9 +88,9 @@ func (h *ErrorHandler) httpResponse(ctx context.Context, err error, r *http.Requ
 				})
 			}
 
-			return gogoxErr, runtime.HTTPStatusFromCode(s.Code())
+			return gogoxErr, httpStatus
 		}
 	}
 
-	return internalErr, http.StatusInternalServerError
+	return internalErr, httpStatus
 }
