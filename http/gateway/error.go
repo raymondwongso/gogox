@@ -49,7 +49,7 @@ func (h *ErrorHandler) ErrorxProtoErrorHandler(ctx context.Context, mux *runtime
 func (h *ErrorHandler) httpResponse(ctx context.Context, err error, r *http.Request, logMd log.Metadata) (interface{}, int) {
 	s, ok := status.FromError(err)
 
-	internalErr := &errorx.Error{
+	defaultErr := &errorx.Error{
 		Code:    errorx.CodeInternal,
 		Message: err.Error(),
 		Details: []*errorx.Details{},
@@ -57,14 +57,19 @@ func (h *ErrorHandler) httpResponse(ctx context.Context, err error, r *http.Requ
 
 	if !ok {
 		h.logger.Errorw("error parsing status grpc", logMd)
-		return internalErr, http.StatusInternalServerError
+		return defaultErr, http.StatusInternalServerError
 	}
 
 	httpStatus := runtime.HTTPStatusFromCode(s.Code())
+	defaultCode, ok := errorx.DefaultCodeMap[s.Code()]
+	if ok {
+		defaultErr.Code = defaultCode
+	}
+
 	sdetails := s.Proto().GetDetails()
 	if len(sdetails) == 0 {
 		h.logger.Errorw("error details not found", logMd)
-		return internalErr, httpStatus
+		return defaultErr, httpStatus
 	}
 
 	for _, detail := range sdetails {
@@ -92,5 +97,5 @@ func (h *ErrorHandler) httpResponse(ctx context.Context, err error, r *http.Requ
 		}
 	}
 
-	return internalErr, httpStatus
+	return defaultErr, httpStatus
 }
