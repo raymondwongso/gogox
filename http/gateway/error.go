@@ -51,7 +51,7 @@ func (h *ErrorHandler) httpResponse(ctx context.Context, err error, r *http.Requ
 
 	defaultErr := &errorx.Error{
 		Code:    errorx.CodeInternal,
-		Message: err.Error(),
+		Message: s.Message(),
 		Details: []*errorx.Details{},
 	}
 
