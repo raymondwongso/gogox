@@ -8,13 +8,15 @@ import (
 type Decider func(req *http.Request, status int) bool
 
 type options struct {
-	ShouldLog Decider
+	ShouldLog         Decider
+	excludedHeaderKey map[string]bool
 }
 
 // DefaultOptions creates default options
 func DefaultOptions() options {
 	return options{
-		ShouldLog: DefaultDecider(),
+		ShouldLog:         DefaultDecider(),
+		excludedHeaderKey: map[string]bool{},
 	}
 }
 
@@ -33,4 +35,13 @@ func SkipPrometheusDecider() Decider {
 		}
 		return true
 	}
+}
+
+// AddExcludedHeaderKey will add the excluded header key so that it will not be logged
+func AddExcludedHeaderKey(opts options, excludedKey []string) options {
+	for _, key := range excludedKey {
+		opts.excludedHeaderKey[key] = true
+	}
+
+	return opts
 }
