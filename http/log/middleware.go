@@ -32,7 +32,7 @@ func (r *loggingResponseWriter) WriteHeader(statusCode int) {
 func LoggingMiddleware(logger log.Logger, handler http.Handler, opts options) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		startTime := time.Now()
-		md := newLogMetadata(r, startTime)
+		md := newLogMetadata(r, startTime, opts)
 
 		lrw := &loggingResponseWriter{
 			responseWriter: w,
@@ -71,12 +71,20 @@ func LoggingMiddleware(logger log.Logger, handler http.Handler, opts options) ht
 	})
 }
 
-func newLogMetadata(r *http.Request, startTime time.Time) log.Metadata {
+func newLogMetadata(r *http.Request, startTime time.Time, opts options) log.Metadata {
 	ctx := r.Context()
 	logMd := log.MetadataFromContext(ctx)
 	logMd["http.start_time"] = startTime.Format(time.RFC3339)
 
-	logMd["http.header"] = r.Header
+	headerToLog := http.Header{}
+	for key := range r.Header {
+		if !opts.excludedHeaderKey[key] {
+			headerToLog[key] = r.Header[key]
+		}
+	}
+
+	logMd["http.header"] = headerToLog
+
 	logMd["http.method"] = r.Method
 	logMd["http.url_path"] = r.URL.Path
 	logMd["http.content_type"] = r.Header.Get("Content-Type")
