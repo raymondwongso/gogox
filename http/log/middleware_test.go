@@ -18,7 +18,6 @@ type mdHeaderCustomMatcher struct {
 	keyThatShouldExists    []string
 	keyThatShouldNotExists []string
 	header                 http.Header
-	debval                 interface{}
 }
 
 // Matches returns whether x is a match.
@@ -58,7 +57,7 @@ func (m *mdHeaderCustomMatcher) Matches(x interface{}) bool {
 
 // String describes what the matcher matches.
 func (m *mdHeaderCustomMatcher) String() string {
-	return fmt.Sprintf("expected md has key %v and doesnt have key %v. got : %v", m.keyThatShouldExists, m.keyThatShouldNotExists, m.header.Get("ValidKey"))
+	return fmt.Sprintf("expected header in metadata has key %v and doesnt have key %v. got : %v", m.keyThatShouldExists, m.keyThatShouldNotExists, m.header)
 }
 
 // TODO(raymondwongso): looks for better testing method
