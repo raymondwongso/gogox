@@ -44,32 +44,20 @@ var DefaultCodeMap = map[codes.Code]string{
 
 // ErrInternal returns generic gogox error with CodeInternal
 func ErrInternal(msg string) *Error {
-	return &Error{
-		Code:    CodeInternal,
-		Message: msg,
-	}
+	return New(CodeInternal, msg)
 }
 
 // ErrNotFound returns generic gogox error with CodeNotFound
 func ErrNotFound(msg string) *Error {
-	return &Error{
-		Code:    CodeNotFound,
-		Message: msg,
-	}
+	return New(CodeNotFound, msg)
 }
 
 // ErrUnauthorized returns generic gogox error with CodeUnauthorized
 func ErrUnauthorized(msg string) *Error {
-	return &Error{
-		Code:    CodeUnauthorized,
-		Message: msg,
-	}
+	return New(CodeUnauthorized, msg)
 }
 
 // ErrInvalidParameter returns generic gogox error with CodeInvalidParameter
 func ErrInvalidParameter(msg string) *Error {
-	return &Error{
-		Code:    CodeInvalidParameter,
-		Message: msg,
-	}
+	return New(CodeInvalidParameter, msg)
 }
